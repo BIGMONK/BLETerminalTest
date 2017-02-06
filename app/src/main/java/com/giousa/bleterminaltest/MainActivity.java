@@ -30,9 +30,13 @@ public class MainActivity extends AppCompatActivity implements InputSystemManage
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btn_start:
+                //初始化
                 mInputSystemManager = InputSystemManager.getInstance();
                 mInputSystemManager.initWithContext(UIUtils.getContext());
+
+                //获取心率数据
                 mInputSystemManager.setHeartBeatSystemEventListener(this);
+
                 Toast.makeText(UIUtils.getContext(),"连接设备",Toast.LENGTH_SHORT).show();
                 break;
             case R.id.btn_send:
