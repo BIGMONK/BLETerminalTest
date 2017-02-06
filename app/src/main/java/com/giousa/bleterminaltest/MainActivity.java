@@ -1,50 +1,60 @@
 package com.giousa.bleterminaltest;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnClick;
 
 public class MainActivity extends AppCompatActivity implements InputSystemManager.HeartBeatSystemEventListener {
 
-    private TextView mAchieveData;
+    @InjectView(R.id.tv_achieve)
+    TextView mTvAchieve;
+    private InputSystemManager mInputSystemManager;
+    private int count = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        initView();
-
+        ButterKnife.inject(this);
     }
 
-    private int count = 0;
-
-    private void initView() {
-        mAchieveData = (TextView) findViewById(R.id.tv_achieve);
-        Button sendData = (Button) findViewById(R.id.btn_send);
-
-        final InputSystemManager inputSystemManager = InputSystemManager.getInstance();
-        inputSystemManager.setHeartBeatSystemEventListener(this);
-
-        sendData.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                inputSystemManager.sendData(count++);
-            }
-        });
+    @OnClick({R.id.btn_start, R.id.btn_send, R.id.btn_stop})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.btn_start:
+                mInputSystemManager = InputSystemManager.getInstance();
+                mInputSystemManager.initWithContext(UIUtils.getContext());
+                mInputSystemManager.setHeartBeatSystemEventListener(this);
+                Toast.makeText(UIUtils.getContext(),"连接设备",Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.btn_send:
+                mInputSystemManager.sendData(count++);
+                break;
+            case R.id.btn_stop:
+                Toast.makeText(UIUtils.getContext(),"断开连接",Toast.LENGTH_SHORT).show();
+                mInputSystemManager.disconnectDevice();
+                break;
+        }
     }
 
     @Override
     public void onHeartBeatChanged(final int heartBeat) {
-        Log.d("MainActivity","heartBeat:"+heartBeat);
+        Log.d("MainActivity", "heartBeat:" + heartBeat);
         UIUtils.runInMainThread(new Runnable() {
             @Override
             public void run() {
-                mAchieveData.setText(""+heartBeat);
+                mTvAchieve.setText("" + heartBeat);
             }
         });
     }
+
+
 }

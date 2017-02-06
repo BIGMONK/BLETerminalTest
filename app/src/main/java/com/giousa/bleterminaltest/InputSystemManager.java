@@ -51,8 +51,19 @@ public class InputSystemManager extends GestureDetector.SimpleOnGestureListener
         return true;
     }
 
+    /**
+     * 发送数据
+     * @param value
+     */
     public void sendData(int value){
         mBlueToothLeManager.sendData(value);
+    }
+
+    /**
+     * 断开连接
+     */
+    public void disconnectDevice(){
+        mBlueToothLeManager.disconnectDevice();
     }
 
 }

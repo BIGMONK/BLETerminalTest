@@ -32,9 +32,6 @@ public class AutoCyclingApplication extends Application {
 
         //主线程id,就是MyApplication(主线程)线程id,获取当前线程id
         mMainThreadId = android.os.Process.myTid();
-
-        InputSystemManager.getInstance().initWithContext(this);
-
     }
 
     public static Context getContext() {

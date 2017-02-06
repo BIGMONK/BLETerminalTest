@@ -11,10 +11,9 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.giousa.bleterminaltest.UIUtils;
-
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -158,12 +157,22 @@ public class BlueToothLeManager extends Thread implements BluetoothLeTool.Blueto
         return false;
     }
 
+    /**
+     * 断开连接
+     */
     public void disconnectDevice() {
-        if (mBluetoothDevice != null)
+        if (mBluetoothDevice != null){
             mBluetoothTool.disconnect();
+            mBluetoothTool = null;
+        }
     }
 
     public void sendData(int value) {
+
+        if(mBluetoothTool == null && mBluetoothGattCharacteristic == null){
+            Toast.makeText(UIUtils.getContext(),"蓝牙未连接",Toast.LENGTH_SHORT).show();
+            return;
+        }
         mBluetoothTool.setCharacteristicNotification(mBluetoothGattCharacteristic, true);
         mBluetoothGattCharacteristic.setValue(""+value);
         mBluetoothTool.writeCharacteristic(mBluetoothGattCharacteristic);
@@ -172,8 +181,6 @@ public class BlueToothLeManager extends Thread implements BluetoothLeTool.Blueto
     private void setCharacteristicNotification() {
         mBluetoothTool.setCharacteristicNotification(mBluetoothGattCharacteristic, true);
     }
-
-    private int count = 0;
 
     /**
      * 解析数据
@@ -186,16 +193,6 @@ public class BlueToothLeManager extends Thread implements BluetoothLeTool.Blueto
         if (mHeartBeatChangedListener != null) {
             mHeartBeatChangedListener.onHeartBeatChanged(b);
         }
-
-//        try {
-//            Log.d(TAG,"getdata-------"+new String(value, "GB2312"));
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        }
-//
-//        mBluetoothTool.setCharacteristicNotification(mBluetoothGattCharacteristic, true);
-//        mBluetoothGattCharacteristic.setValue(""+count++);
-//        mBluetoothTool.writeCharacteristic(mBluetoothGattCharacteristic);
     }
 
 
