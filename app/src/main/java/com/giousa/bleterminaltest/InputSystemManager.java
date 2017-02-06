@@ -39,12 +39,12 @@ public class InputSystemManager extends GestureDetector.SimpleOnGestureListener
     }
 
 
-    public boolean initWithContext(Context context) {
+    public boolean initWithContext(Context context,String name) {
 
         mBlueToothLeManager = new BlueToothLeManager(context);
         mBlueToothLeManager.initBlueToothInfo();
 //        设置设备的名称，一台设备只能有一个名字
-        mBlueToothLeManager.setDeviceName("HMSoft");
+        mBlueToothLeManager.setDeviceName(name);
 
 //        设置监听事件
         mBlueToothLeManager.setHeartBeatChangedListener(this);

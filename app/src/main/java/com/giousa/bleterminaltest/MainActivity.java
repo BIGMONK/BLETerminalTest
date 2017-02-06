@@ -32,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements InputSystemManage
             case R.id.btn_start:
                 //初始化
                 mInputSystemManager = InputSystemManager.getInstance();
-                mInputSystemManager.initWithContext(UIUtils.getContext());
+                mInputSystemManager.initWithContext(UIUtils.getContext(),"HMSoft");
 
                 //获取心率数据
                 mInputSystemManager.setHeartBeatSystemEventListener(this);
