@@ -41,8 +41,6 @@ public class BluetoothLeTool {
         void onDisconnected();
     }
 
-    private Context mContext = null;
-
     private BluetoothLeDataListener mBluetoothLeDataListener;
     private BluetoothLeDiscoveredListener mBluetoothLeDiscoveredListener;
     private BluetoothLeStatusListener mBluetoothLeStatusListener;
@@ -137,20 +135,8 @@ public class BluetoothLeTool {
     }
 
     private void broadcastUpdate(BluetoothGattCharacteristic characteristic) {
-            if (UUID_HEART_RATE_MEASUREMENT.equals(characteristic.getUuid())) {
-//                int flag = characteristic.getProperties();
-//                int format = -1;
-//            if ((flag & 0x01) != 0) {
-//                format = BluetoothGattCharacteristic.FORMAT_UINT16;
-//                Log.d(TAG, "Heart rate format UINT16.");
-//            } else {
-//                format = BluetoothGattCharacteristic.FORMAT_UINT8;
-//                Log.d(TAG, "Heart rate format UINT8.");
-//            }
-//            final int heartRate = characteristic.getIntValue(format, 1);
-//            Log.d(TAG, String.format("Received heart rate: %d", heartRate));
-//            intent.putExtra(EXTRA_DATA, String.valueOf(heartRate));
-//            Log.d(TAG, "data is 1 : " + heartRate);
+        if (UUID_HEART_RATE_MEASUREMENT.equals(characteristic.getUuid())) {
+
         } else {
             // For all other profiles, writes the data formatted in HEX.
             final byte[] data = characteristic.getValue();
@@ -163,8 +149,6 @@ public class BluetoothLeTool {
 
 
     public boolean initialize() {
-        // For API level 18 and above, get a reference to BluetoothAdapter through
-        // BluetoothManager.
         if (mBluetoothManager == null) {
             mBluetoothManager = (BluetoothManager) UIUtils.getContext().getSystemService(Context.BLUETOOTH_SERVICE);
             if (mBluetoothManager == null) {

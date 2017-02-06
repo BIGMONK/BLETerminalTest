@@ -17,7 +17,6 @@ import com.giousa.bleterminaltest.UIUtils;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -165,12 +164,9 @@ public class BlueToothLeManager extends Thread implements BluetoothLeTool.Blueto
     }
 
     public void sendData(int value) {
-//        synchronized (mSendDataList) {
-////            if (mSendDataList.size() > 10000) {
-////                mSendDataList.remove(0);
-////            }
-//            mSendDataList.add(value);
-//        }
+        mBluetoothTool.setCharacteristicNotification(mBluetoothGattCharacteristic, true);
+        mBluetoothGattCharacteristic.setValue(""+value);
+        mBluetoothTool.writeCharacteristic(mBluetoothGattCharacteristic);
     }
 
     private void setCharacteristicNotification() {
@@ -185,15 +181,21 @@ public class BlueToothLeManager extends Thread implements BluetoothLeTool.Blueto
      */
     public void onDataAvailable(byte[] value) {
 
-        try {
-            Log.d(TAG,"getdata-------"+new String(value, "GB2312"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        byte b = value[0];
+        Log.d(TAG,"getdata byte-------"+b);
+        if (mHeartBeatChangedListener != null) {
+            mHeartBeatChangedListener.onHeartBeatChanged(b);
         }
 
-        mBluetoothTool.setCharacteristicNotification(mBluetoothGattCharacteristic, true);
-        mBluetoothGattCharacteristic.setValue(""+count++);
-        mBluetoothTool.writeCharacteristic(mBluetoothGattCharacteristic);
+//        try {
+//            Log.d(TAG,"getdata-------"+new String(value, "GB2312"));
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+//
+//        mBluetoothTool.setCharacteristicNotification(mBluetoothGattCharacteristic, true);
+//        mBluetoothGattCharacteristic.setValue(""+count++);
+//        mBluetoothTool.writeCharacteristic(mBluetoothGattCharacteristic);
     }
 
 
