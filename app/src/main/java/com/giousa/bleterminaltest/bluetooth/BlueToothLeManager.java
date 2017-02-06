@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.giousa.bleterminaltest.UIUtils;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -28,29 +29,13 @@ public class BlueToothLeManager extends Thread implements BluetoothLeTool.Blueto
         BluetoothLeTool.BluetoothLeDiscoveredListener,
         BluetoothLeTool.BluetoothLeStatusListener{
 
-    public interface SpeedChangedListener {
-        void onSpeedChanged(short speed);
-    }
-
-    public interface AngleChangedListener {
-        void onAngleChanged(float angle);
-    }
 
     public interface HeartBeatChangedListener {
         void onHeartBeatChanged(int heartBeat);
     }
 
     private HeartBeatChangedListener mHeartBeatChangedListener;
-    private SpeedChangedListener mSpeedChangedListener;
-    private AngleChangedListener mAngleChangedListener;
 
-    public void setAngleChangedListener(AngleChangedListener angleChangedListener) {
-        mAngleChangedListener = angleChangedListener;
-    }
-
-    public void setSpeedChangedListener(SpeedChangedListener speedChangedListener) {
-        mSpeedChangedListener = speedChangedListener;
-    }
 
     public void setHeartBeatChangedListener(HeartBeatChangedListener heartBeatChangedListener) {
         mHeartBeatChangedListener = heartBeatChangedListener;
@@ -67,18 +52,21 @@ public class BlueToothLeManager extends Thread implements BluetoothLeTool.Blueto
     private BluetoothGattCharacteristic mBluetoothGattCharacteristic;
     private int mCharProp;
     private String mDeviceName;
-    private long mLastSendTimestamps;
-
-    private List<Integer> mSendDataList = null;
 
     public BlueToothLeManager(Context pContext) {
         mContext = pContext;
     }
 
+
+    public void initBlueToothInfo() {
+        blueToothInit();
+        scanLeDevice(true);
+    }
+
     private boolean blueToothInit() {
 
         mHandler = new Handler();
-        mLeDevices = new ArrayList<BluetoothDevice>();
+        mLeDevices = new ArrayList<>();
 
         if (!mContext.getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
             return false;
@@ -103,23 +91,11 @@ public class BlueToothLeManager extends Thread implements BluetoothLeTool.Blueto
             }
         }
 
-        mSendDataList = new LinkedList<Integer>();
-
-        mLastSendTimestamps = System.currentTimeMillis();
-
         return true;
     }
 
     private void scanLeDevice(final boolean enable) {
         if (enable) {
-            // Stops scanning after a pre-defined scan period.
-//            mHandler.postDelayed(new Runnable() {
-//                @Override
-//                public void run() {
-////                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
-////                    connectDevice();
-//                }
-//            }, 5000);
             mBluetoothAdapter.startLeScan(mLeScanCallback);
         } else {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
@@ -152,22 +128,6 @@ public class BlueToothLeManager extends Thread implements BluetoothLeTool.Blueto
                     });
                 }
             };
-
-    public BluetoothDevice getDevice() {
-        int count = mLeDevices.size();
-        for (int i = 0; i < count; i++) {
-            if (mDeviceName == null)
-                return null;
-
-            Log.d(TAG, "devices : " + mLeDevices.get(i).getName() + " mDeviceName  : " + mDeviceName);
-
-
-            if (mLeDevices.get(i).getName().equals(mDeviceName)) {
-                return mLeDevices.get(i);
-            }
-        }
-        return null;
-    }
 
     public boolean connectDevice() {
 
@@ -205,12 +165,12 @@ public class BlueToothLeManager extends Thread implements BluetoothLeTool.Blueto
     }
 
     public void sendData(int value) {
-        synchronized (mSendDataList) {
-//            if (mSendDataList.size() > 10000) {
-//                mSendDataList.remove(0);
-//            }
-            mSendDataList.add(value);
-        }
+//        synchronized (mSendDataList) {
+////            if (mSendDataList.size() > 10000) {
+////                mSendDataList.remove(0);
+////            }
+//            mSendDataList.add(value);
+//        }
     }
 
     private void setCharacteristicNotification() {
@@ -219,77 +179,23 @@ public class BlueToothLeManager extends Thread implements BluetoothLeTool.Blueto
 
     private int count = 0;
 
+    /**
+     * 解析数据
+     * @param value
+     */
     public void onDataAvailable(byte[] value) {
 
-        Log.d(TAG,"getdata-------"+value.toString());
+        try {
+            Log.d(TAG,"getdata-------"+new String(value, "GB2312"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
 
         mBluetoothTool.setCharacteristicNotification(mBluetoothGattCharacteristic, true);
-
         mBluetoothGattCharacteristic.setValue(""+count++);
         mBluetoothTool.writeCharacteristic(mBluetoothGattCharacteristic);
-
-//        if (value[0] == 0x04 && value[7] == 0x05) {
-//
-//            synchronized (mSendDataList) {
-//                if (mSendDataList != null && mSendDataList.size() > 0) {
-//                    Integer sendData = mSendDataList.get(0);
-//                    byte bys = sendData.byteValue();
-//                    byte[] sendBuffer = new byte[]{4, 64, bys, 5};
-//                    mBluetoothTool.setCharacteristicNotification(mBluetoothGattCharacteristic, true);
-//
-//                    mBluetoothGattCharacteristic.setValue(sendBuffer);
-//                    mBluetoothTool.writeCharacteristic(mBluetoothGattCharacteristic);
-//
-//                    mSendDataList.remove(0);
-//                }
-//            }
-//        }
-//
-//        if (value[0] != 0x04 || value[7] != 0x05) {
-//            return ;
-//        }
-//
-//        if (System.currentTimeMillis() - mLastSendTimestamps > 50) {
-//
-//            UserInputInfo userInputInfo = parseUserInputInfo(value);
-//
-//            if (userInputInfo == null) {
-//                return;
-//            }
-//
-//            doMyWork(userInputInfo);
-//
-//            mLastSendTimestamps = System.currentTimeMillis();
-//        }
     }
 
-    private void doMyWork(UserInputInfo userInputInfo) {
-        //如果有其它的变化，全部放到这儿来处理
-        if ((userInputInfo.changeValueStatus & UserInputInfo.VALUE_CHANGED_HEARTRATE)
-                == UserInputInfo.VALUE_CHANGED_HEARTRATE) {
-            if (mHeartBeatChangedListener != null) {
-                mHeartBeatChangedListener.onHeartBeatChanged(userInputInfo.heartBeat);
-            }
-        }
-
-        if (mAngleChangedListener != null) {
-            mAngleChangedListener.onAngleChanged(userInputInfo.angle);
-        }
-
-        if (mSpeedChangedListener != null) {
-            mSpeedChangedListener.onSpeedChanged(userInputInfo.speed);
-        }
-
-    }
-
-    public void initBlueToothInfo() {
-        blueToothInit();
-        scanLeDevice(true);
-    }
-
-    public void unintBlueToothInfo() {
-
-    }
 
     public void onConnected() {
         Log.d(TAG, "****ACTION_GATT_CONNECTED********");
@@ -321,93 +227,6 @@ public class BlueToothLeManager extends Thread implements BluetoothLeTool.Blueto
 
     public void setDeviceName(String name) {
         mDeviceName = name;
-    }
-
-    /**
-     * Created by black on 2016/1/24 0024.
-     */
-    // TODO: 2016/6/30 0030 基本数据类 
-    public static class UserInputInfo implements Cloneable {
-        public static final int VALUE_CHANGED_SPEED = 0x00000008;
-        public static final int VALUE_CHANGED_ANGLE = 0x00000010;
-        public static final int VALUE_CHANGED_HEARTRATE = 0x00000040;
-
-        public int changeValueStatus = 0;
-        public short speed;
-        public float angle;
-        public int heartBeat;
-        public int resistance;
-
-        public UserInputInfo() {
-
-        }
-
-        public void resetChanged() {
-            changeValueStatus = 0x00000000;
-        }
-    }
-
-    //// TODO: 2016/6/30 0030 解析数据 
-    private UserInputInfo parseUserInputInfo(byte[] inBuffer) {
-
-        UserInputInfo userInputInfo = new UserInputInfo();
-        boolean hasAnyChanged = false;
-
-//        float speed = (short) (inBuffer[6]*256 + inBuffer[7]);//速度
-//        float speed = (float) (inBuffer[2] * 256 + inBuffer[3]) / 100;//速度
-
-        short speed = (short) (inBuffer[2] & 0xFF);
-//        if(speed < 0){
-//            speed = (short) (255+speed);
-//        }
-
-        if(speed == 0){
-            userInputInfo.speed = 0;
-            hasAnyChanged = true;
-        }else{
-            if (userInputInfo.speed != speed) {
-                userInputInfo.speed = speed;
-//                userInputInfo.changeValueStatus |= UserInputInfo.VALUE_CHANGED_SPEED;
-                hasAnyChanged = true;
-            }
-        }
-
-
-
-
-//        int heartBeat = inBuffer[8];//心率
-        int heartBeat = inBuffer[4];//心率
-        if (userInputInfo.heartBeat != heartBeat) {
-            userInputInfo.heartBeat = heartBeat;
-            userInputInfo.changeValueStatus |= UserInputInfo.VALUE_CHANGED_HEARTRATE;
-            hasAnyChanged = true;
-        }
-
-        //float angle = (float)(((short) (inBuffer[9]*256 + inBuffer[10])-3200)/22.0f);//角度
-//        float angle = (float) (inBuffer[5] * 256 + inBuffer[6]) / 100;//角度
-        float angle = inBuffer[5];//角度
-//        if (userInputInfo.angle != angle) {
-//            userInputInfo.angle = angle;
-//            userInputInfo.changeValueStatus |= UserInputInfo.VALUE_CHANGED_ANGLE;
-//            hasAnyChanged = true;
-//        }
-
-        if(angle == 0){
-            userInputInfo.angle = 0;
-            hasAnyChanged = true;
-        }else{
-            if (userInputInfo.angle != angle) {
-                userInputInfo.angle = angle;
-//                userInputInfo.changeValueStatus |= UserInputInfo.VALUE_CHANGED_SPEED;
-                hasAnyChanged = true;
-            }
-        }
-
-        if (!hasAnyChanged) {
-            return null;
-        }
-
-        return userInputInfo;
     }
 
 }
