@@ -6,7 +6,10 @@ import android.os.Handler;
 
 
 /**
- * Created by liuenbao on 1/22/16.
+ * Description:
+ * Author:Giousa
+ * Date:2017/2/6
+ * Email:65489469@qq.com
  */
 public class AutoCyclingApplication extends Application {
 

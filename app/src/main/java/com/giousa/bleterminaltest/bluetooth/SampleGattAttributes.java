@@ -3,7 +3,10 @@ package com.giousa.bleterminaltest.bluetooth;
 import java.util.HashMap;
 
 /**
- * Created by black on 2016/4/12.
+ * Description:
+ * Author:Giousa
+ * Date:2017/2/6
+ * Email:65489469@qq.com
  */
 public class SampleGattAttributes {
 

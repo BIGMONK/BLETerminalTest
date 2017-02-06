@@ -6,7 +6,10 @@ import android.view.GestureDetector;
 import com.giousa.bleterminaltest.bluetooth.BlueToothLeManager;
 
 /**
- * Created by liuenbao on 1/23/16.
+ * Description:
+ * Author:Giousa
+ * Date:2017/2/6
+ * Email:65489469@qq.com
  */
 public class InputSystemManager extends GestureDetector.SimpleOnGestureListener
         implements BlueToothLeManager.HeartBeatChangedListener {

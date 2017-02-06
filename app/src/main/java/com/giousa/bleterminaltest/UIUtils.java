@@ -3,16 +3,17 @@ package com.giousa.bleterminaltest;
 
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
-import android.util.DisplayMetrics;
 import android.view.View;
 
-import java.util.Locale;
-
-
+/**
+ * Description:
+ * Author:Giousa
+ * Date:2017/2/6
+ * Email:65489469@qq.com
+ */
 public class UIUtils {
 
 	/**
